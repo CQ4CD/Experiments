@@ -1,0 +1,35 @@
+name: test-workflow.yml
+on:
+  workflow_dispatch:
+
+
+jobs:
+  build-natives:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        wait:
+          - { wait: 30 }
+          - { wait: 60 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 200 }
+    steps:
+      - name: Wait
+        run: sleep ${{ matrix.wait.wait }}
