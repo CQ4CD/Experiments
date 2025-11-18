@@ -21,14 +21,14 @@ jobs:
           - { wait: 1 }
           - { wait: 1 }
           - { wait: 1 }
-          - { wait: 1 }
-          - { wait: 1 }
-          - { wait: 1 }
-          - { wait: 1 }
-          - { wait: 1 }
-          - { wait: 1 }
-          - { wait: 1 }
-          - { wait: 1 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 30 }
+          - { wait: 30 }
           - { wait: 30 }
           - { wait: 60 }
           - { wait: 120 }
