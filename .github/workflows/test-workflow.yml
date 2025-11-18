@@ -9,27 +9,29 @@ jobs:
     strategy:
       matrix:
         wait:
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
           - { wait: 30 }
           - { wait: 60 }
-          - { wait: 10 }
-          - { wait: 10 }
-          - { wait: 10 }
-          - { wait: 10 }
-          - { wait: 10 }
-          - { wait: 10 }
-          - { wait: 10 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 30 }
-          - { wait: 200 }
+          - { wait: 120 }
     steps:
       - name: Wait
         run: sleep ${{ matrix.wait.wait }}
