@@ -1,31 +1,24 @@
 stages:
-  - build
+  - wait
 
-build-natives:
-  stage: build
+wait-jobs:
+  stage: wait
   parallel:
     matrix:
+      - WAIT: 0
       - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 1
-      - WAIT: 10
-      - WAIT: 10
-      - WAIT: 10
-      - WAIT: 10
-      - WAIT: 10
+      - WAIT: 2
+      - WAIT: 3
+      - WAIT: 4
+      - WAIT: 5
+      - WAIT: 6
+      - WAIT: 7
+      - WAIT: 8
+      - WAIT: 9
       - WAIT: 10
       - WAIT: 30
-      - WAIT: 30
-      - WAIT: 30
+      - WAIT: 40
+      - WAIT: 50
       - WAIT: 60
       - WAIT: 120
   script:
