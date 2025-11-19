@@ -1,0 +1,32 @@
+stages:
+  - build
+
+build-natives:
+  stage: build
+  parallel:
+    matrix:
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 1
+      - WAIT: 10
+      - WAIT: 10
+      - WAIT: 10
+      - WAIT: 10
+      - WAIT: 10
+      - WAIT: 10
+      - WAIT: 30
+      - WAIT: 30
+      - WAIT: 30
+      - WAIT: 60
+      - WAIT: 120
+  script:
+    - sleep $WAIT
