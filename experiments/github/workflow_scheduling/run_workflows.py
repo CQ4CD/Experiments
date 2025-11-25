@@ -1,4 +1,4 @@
-print('Loading run_workflows')
+print('Loading run_workflows', flush=True)
 
 import json
 import os
@@ -20,7 +20,7 @@ workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
 
 experiment_number = get_fresh_experiment_number()
-print('Experiment number', experiment_number)
+print('Experiment number', experiment_number, flush=True)
 
 url_dispatch = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches"
 url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
@@ -103,5 +103,5 @@ def experiment():
 
 
 if __name__ == '__main__':
-    print('Starting Experiment')
+    print('Starting Experiment', flush=True)
     experiment()
