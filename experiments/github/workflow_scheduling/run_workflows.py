@@ -92,7 +92,7 @@ def experiment():
     plt.xlabel("Run")
     plt.ylabel("Duration (s)")
     plt.title("Workflow Durations")
-    workflow_durations = Path(__file__).parent / workflow_name / f"workflow_durations_{experiment_number}.json"
+    workflow_durations = Path(__file__).parent / workflow_name / f"workflow_durations_{experiment_number}.png"
     plt.savefig(workflow_durations)
 
 
