@@ -25,16 +25,16 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run workflows
-        run: python experiments/github/workflow_scheduling/run_workflows.py
+        run: python -m experiments.github.workflow_scheduling.run_workflows.py
 
       - name: Analyze
-        run: python experiments/github/workflow_scheduling/analyze.py
+        run: python -m experiments.github.workflow_scheduling.analyze.py
 
       - name: Download logs
-        run: python experiments/github/workflow_scheduling/download_logs.py
+        run: python -m experiments.github.workflow_scheduling.download_logs.py
 
       - name: Analyze logs
-        run: python experiments/github/workflow_scheduling/log_analyzer.py
+        run: python -m experiments.github.workflow_scheduling.log_analyzer.py
 
       - name: Check for changes
         id: git-check
