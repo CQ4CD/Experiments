@@ -5,16 +5,21 @@ import requests
 import dotenv
 import matplotlib.pyplot as plt
 
+from pathlib import Path
+
 dotenv.load_dotenv()
 
 owner = 'CQ4CD'
 repo = 'Experiments'
-workflow = 'unfair-test-workflow.yml'
+workflow_name = 'unfair-test-workflow'
+workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
 experiment_number = 0
 
 url_dispatch = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches"
 url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
+
+run_id_file = Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json"
 
 headers = {
     "Accept": "application/vnd.github+json",
@@ -24,11 +29,13 @@ headers = {
 
 
 def add_run_id(run_id):
-    with open(f"results/github-unfair-test-workflow/run_ids_{experiment_number}.json", 'r') as f:
-        run_ids = json.load(f)
+    if run_id_file.exists():
+        run_ids = json.loads(run_id_file.read_text())
+    else:
+        run_id_file.parent.mkdir(parents=True, exist_ok=True)
+        run_ids = []
     run_ids.append(run_id)
-    with open(f"results/github-unfair-test-workflow/run_ids_{experiment_number}.json", 'w') as f:
-        json.dump(run_ids, f, indent='\t')
+    run_id_file.write_text(json.dumps(run_ids, indent='\t'))
 
 
 def trigger(run_number):
@@ -66,7 +73,7 @@ def wait(run_id, run_number):
 
 def experiment():
     durations = []
-    for run_number in range(10):
+    for run_number in range(15):
         trigger(run_number)
         time.sleep(3)
         latest = None

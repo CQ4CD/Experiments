@@ -27,11 +27,11 @@ jobs:
           - { wait: 10 }
           - { wait: 10 }
           - { wait: 10 }
+          - { wait: 120 }
           - { wait: 30 }
           - { wait: 30 }
           - { wait: 30 }
           - { wait: 60 }
-          - { wait: 120 }
     steps:
       - name: Wait
         run: sleep ${{ matrix.wait.wait }}
