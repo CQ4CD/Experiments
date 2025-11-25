@@ -1,0 +1,32 @@
+﻿2025-11-25T15:55:21.5469418Z Current runner version: '2.329.0'
+2025-11-25T15:55:21.5493521Z ##[group]Runner Image Provisioner
+2025-11-25T15:55:21.5494361Z Hosted Compute Agent
+2025-11-25T15:55:21.5494944Z Version: 20251016.436
+2025-11-25T15:55:21.5495510Z Commit: 8ab8ac8bfd662a3739dab9fe09456aba92132568
+2025-11-25T15:55:21.5496239Z Build Date: 2025-10-15T20:44:12Z
+2025-11-25T15:55:21.5496814Z ##[endgroup]
+2025-11-25T15:55:21.5497377Z ##[group]Operating System
+2025-11-25T15:55:21.5497892Z Ubuntu
+2025-11-25T15:55:21.5498443Z 24.04.3
+2025-11-25T15:55:21.5498912Z LTS
+2025-11-25T15:55:21.5499314Z ##[endgroup]
+2025-11-25T15:55:21.5499923Z ##[group]Runner Image
+2025-11-25T15:55:21.5500446Z Image: ubuntu-24.04
+2025-11-25T15:55:21.5501281Z Version: 20251112.124.1
+2025-11-25T15:55:21.5502369Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251112.124/images/ubuntu/Ubuntu2404-Readme.md
+2025-11-25T15:55:21.5503905Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251112.124
+2025-11-25T15:55:21.5504914Z ##[endgroup]
+2025-11-25T15:55:21.5506005Z ##[group]GITHUB_TOKEN Permissions
+2025-11-25T15:55:21.5508105Z Contents: read
+2025-11-25T15:55:21.5508630Z Metadata: read
+2025-11-25T15:55:21.5509162Z Packages: read
+2025-11-25T15:55:21.5509681Z ##[endgroup]
+2025-11-25T15:55:21.5512173Z Secret source: Actions
+2025-11-25T15:55:21.5513172Z Prepare workflow directory
+2025-11-25T15:55:21.5890196Z Prepare all required actions
+2025-11-25T15:55:21.6139722Z Complete job name: wait (10)
+2025-11-25T15:55:21.7524082Z ##[group]Run sleep 10
+2025-11-25T15:55:21.7525108Z [36;1msleep 10[0m
+2025-11-25T15:55:21.8416122Z shell: /usr/bin/bash -e {0}
+2025-11-25T15:55:21.8417585Z ##[endgroup]
+2025-11-25T15:55:31.8813345Z Cleaning up orphan processes
