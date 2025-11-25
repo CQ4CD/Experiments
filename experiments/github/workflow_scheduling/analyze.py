@@ -16,7 +16,6 @@ workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
 experiment_number = 0
 
-url_dispatch = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches"
 url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
 
 run_id_file = Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json"
