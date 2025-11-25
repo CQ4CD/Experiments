@@ -1,0 +1,60 @@
+name: run-workflow-experiment.yml
+on:
+  workflow_dispatch:
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  run-workflow-experiment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r new-versions/requirements.txt
+
+      - name: Run workflows
+        run: python experiments/github/workflow_scheduling/run_workflows.py
+
+      - name: Analyze
+        run: python experiments/github/workflow_scheduling/analyze.py
+
+      - name: Download logs
+        run: python experiments/github/workflow_scheduling/download_logs.py
+
+      - name: Analyze logs
+        run: python experiments/github/workflow_scheduling/log_analyzer.py
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.git-check.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          author: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
+          assignees: okafke
+          #reviewers: okafke
+          commit-message: "feat(github): automated experiment run"
+          delete-branch: true
+          branch: automated-experiment-run
+          title: "feat(github): automated experiment run"

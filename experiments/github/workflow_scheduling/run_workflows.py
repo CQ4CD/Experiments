@@ -14,7 +14,16 @@ repo = 'Experiments'
 workflow_name = 'unfair-test-workflow-limited'
 workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
-experiment_number = 0
+
+
+def get_experiment_number():
+    result = 0
+    while (Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json").exists():
+        result += 1
+    return result
+
+
+experiment_number = get_experiment_number()
 
 url_dispatch = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches"
 url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
