@@ -49,6 +49,8 @@ def trigger(run_number):
     response = requests.post(url_dispatch, headers=headers, json={"ref": "main"})
     print(response)
     print('Triggered run', run_number, response.status_code)
+    if not response.ok:
+        raise Exception(f"Failed to trigger run! {response.status_code} {response.reason}")
 
 
 def get_latest_run(run_number):
