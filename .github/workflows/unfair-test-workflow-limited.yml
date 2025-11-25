@@ -1,0 +1,38 @@
+name: unfair-test-workflow-limited.yml
+on:
+  workflow_dispatch:
+
+
+jobs:
+  wait:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+      matrix:
+        wait:
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 1 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 10 }
+          - { wait: 120 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 30 }
+          - { wait: 60 }
+    steps:
+      - name: Wait
+        run: sleep ${{ matrix.wait.wait }}

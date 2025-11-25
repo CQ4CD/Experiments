@@ -11,7 +11,7 @@ dotenv.load_dotenv()
 
 owner = 'CQ4CD'
 repo = 'Experiments'
-workflow_name = 'unfair-test-workflow'
+workflow_name = 'unfair-test-workflow-limited'
 workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
 experiment_number = 0
@@ -92,7 +92,8 @@ def experiment():
     plt.xlabel("Run")
     plt.ylabel("Duration (s)")
     plt.title("Workflow Durations")
-    plt.savefig("workflow_durations.png")
+    workflow_durations = Path(__file__).parent / workflow_name / f"workflow_durations_{experiment_number}.json"
+    plt.savefig(workflow_durations)
 
 
 if __name__ == '__main__':
