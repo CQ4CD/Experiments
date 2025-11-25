@@ -1,4 +1,4 @@
-name: test-workflow.yml
+name: unfair-unfair-test-workflow.yml
 on:
   workflow_dispatch:
 
