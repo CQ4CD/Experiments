@@ -1,9 +1,18 @@
 import re
+import os
 from pathlib import Path
 from datetime import datetime
 import matplotlib.pyplot as plt
+import dotenv
 
-BASE_PATH = Path(__file__).parent / "unfair-test-workflow-limited" / "experiment_0"
+from experiments.github.workflow_scheduling.commons import get_latest_experiment_number
+
+dotenv.load_dotenv()
+
+workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
+experiment_number = get_latest_experiment_number()
+
+BASE_PATH = Path(__file__).parent / workflow_name / f"experiment_{experiment_number}"
 ts_pattern = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)")
 
 

@@ -7,14 +7,16 @@ import matplotlib.pyplot as plt
 
 from pathlib import Path
 
+from experiments.github.workflow_scheduling.commons import get_latest_experiment_number
+
 dotenv.load_dotenv()
 
 owner = 'CQ4CD'
 repo = 'Experiments'
-workflow_name = 'unfair-test-workflow-limited'
+workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
 workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
-experiment_number = 0
+experiment_number = get_latest_experiment_number()
 
 url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
 

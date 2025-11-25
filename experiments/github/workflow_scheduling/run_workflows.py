@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 
 from pathlib import Path
 
+from experiments.github.workflow_scheduling.commons import get_fresh_experiment_number
+
 dotenv.load_dotenv()
 
 owner = 'CQ4CD'
@@ -15,15 +17,8 @@ workflow_name = 'unfair-test-workflow-limited'
 workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
 
-
-def get_experiment_number():
-    result = 0
-    while (Path(__file__).parent / workflow_name / f"run_ids_{result}.json").exists():
-        result += 1
-    return result
-
-
-experiment_number = get_experiment_number()
+experiment_number = get_fresh_experiment_number()
+print('Experiment number', experiment_number)
 
 url_dispatch = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches"
 url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
@@ -106,4 +101,5 @@ def experiment():
 
 
 if __name__ == '__main__':
+    print('Starting Experiment')
     experiment()

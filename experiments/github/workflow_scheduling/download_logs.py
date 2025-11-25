@@ -7,14 +7,16 @@ import dotenv
 
 from pathlib import Path
 
+from experiments.github.workflow_scheduling.commons import get_latest_experiment_number
+
 dotenv.load_dotenv()
 
 owner = 'CQ4CD'
 repo = 'Experiments'
-workflow_name = 'unfair-test-workflow-limited'
+workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
 workflow = f"{workflow_name}.yml"
 token = os.getenv("GH_TOKEN")
-experiment_number = 0
+experiment_number = get_latest_experiment_number()
 
 run_id_file = Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json"
 
