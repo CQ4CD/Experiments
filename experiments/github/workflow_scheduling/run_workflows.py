@@ -18,7 +18,7 @@ token = os.getenv("GH_TOKEN")
 
 def get_experiment_number():
     result = 0
-    while (Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json").exists():
+    while (Path(__file__).parent / workflow_name / f"run_ids_{result}.json").exists():
         result += 1
     return result
 
