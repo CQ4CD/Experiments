@@ -13,7 +13,7 @@ gitlab_url = os.getenv("GITLAB_URL")
 project_id = '9767'
 token = os.getenv("GITLAB_TOKEN")
 branch = 'main'
-experiment_number = 1
+experiment_number = 0
 
 api_trigger = f"{gitlab_url}/api/v4/projects/{project_id}/pipeline"
 api_pipelines = f"{gitlab_url}/api/v4/projects/{project_id}/pipelines"

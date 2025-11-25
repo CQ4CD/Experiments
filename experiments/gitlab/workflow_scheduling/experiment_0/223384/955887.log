@@ -1,0 +1,28 @@
+[0KRunning with gitlab-runner 18.2.2 (50bc0499)[0;m
+[0K  on group-dos m-citqFFU, system ID: s_158a03d7f4be[0;m
+[0K[36;1mResolving secrets[0;m[0;m
+section_start:1764074783:prepare_executor[0K[0K[36;1mPreparing the "docker" executor[0;m[0;m
+[32;1mUsing default image[0;m
+[0KUsing Docker executor with image alpine:latest ...[0;m
+[32;1mUsing default image[0;m
+[0KUsing effective pull policy of [always] for container alpine:latest[0;m
+[0KPulling docker image alpine:latest ...[0;m
+[0KUsing docker image sha256:706db57fb2063f39f69632c5b5c9c439633fda35110e65587c5d85553fd1cc38 for alpine:latest with digest alpine@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412 ...[0;m
+section_end:1764074785:prepare_executor[0Ksection_start:1764074785:prepare_script[0K[0K[36;1mPreparing environment[0;m[0;m
+[0KUsing effective pull policy of [always] for container sha256:34ba96a76bafdefbfb157144f40c119d87aad74f55a61ff4493638a976ec2986[0;m
+Running on runner-m-citqffu-project-9767-concurrent-0 via basecamp-demos...
+section_end:1764074786:prepare_script[0Ksection_start:1764074786:get_sources[0K[0K[36;1mGetting source from Git repository[0;m[0;m
+[32;1mGitaly correlation ID: 01KAXGT0TVE12EQDNNSASNZG0R[0;m
+[32;1mFetching changes with git depth set to 20...[0;m
+Reinitialized existing Git repository in /builds/dos/projects/cq4cd/internal/experiments/.git/
+[32;1mCreated fresh repository.[0;m
+[32;1mChecking out bfc31d6f as detached HEAD (ref is main)...[0;m
+
+[32;1mSkipping Git submodules setup[0;m
+section_end:1764074787:get_sources[0Ksection_start:1764074787:step_script[0K[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+[32;1mUsing default image[0;m
+[0KUsing effective pull policy of [always] for container alpine:latest[0;m
+[0KUsing docker image sha256:706db57fb2063f39f69632c5b5c9c439633fda35110e65587c5d85553fd1cc38 for alpine:latest with digest alpine@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412 ...[0;m
+[32;1m$ sleep $WAIT[0;m
+section_end:1764074793:step_script[0Ksection_start:1764074793:cleanup_file_variables[0K[0K[36;1mCleaning up project directory and file based variables[0;m[0;m
+section_end:1764074793:cleanup_file_variables[0K[32;1mJob succeeded[0;m
