@@ -38,6 +38,9 @@ jobs:
       - name: Analyze logs
         run: python -m experiments.github.workflow_scheduling.log_analyzer
 
+      - name: Create Gantt charts
+        run: python -m experiments.github.workflow_scheduling.gantt_charts
+
       - name: Check for changes
         id: git-check
         run: |
