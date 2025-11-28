@@ -1,21 +1,15 @@
-name: fair-test-workflow.yml
+name: unfair-test-workflow2.yml
 on:
   workflow_dispatch:
 
 
 jobs:
-  wait-120:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait 120 seconds
-        run: sleep 120
-
   wait:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
       matrix:
         wait:
+          - { wait: 120 }
           - { wait: 1 }
           - { wait: 1 }
           - { wait: 1 }
