@@ -17,7 +17,8 @@ repo = os.getenv('REPO', 'Experiments')
 workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
 workflow = os.getenv('WORKFLOW', f"{workflow_name}.yml")
 gh_token = os.getenv("GH_TOKEN")
-gh_url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
+gh_actions_url = f"https://api.github.com/repos/{owner}/{repo}/actions"
+gh_runs_url = f"{gh_actions_url}/runs"
 gh_headers = {
     "Accept": "application/vnd.github+json",
     "Authorization": f"Bearer {gh_token}",

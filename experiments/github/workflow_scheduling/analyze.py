@@ -1,20 +1,28 @@
 import json
 import time
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import requests
 
-from experiments.commons import get_latest_experiment_number, workflow_name, gh_url_runs, gh_headers, get_run_id_file, \
-    get_experiment_folder
+from experiments.commons import (get_latest_experiment_number, gh_runs_url, gh_headers,
+                                 get_run_id_file, get_experiment_folder)
 
 experiment_number = get_latest_experiment_number()
 run_id_file = get_run_id_file(experiment_number)
+experiments_folder = get_experiment_folder(experiment_number)
+
+
+def get_jobs(run_id):
+    jobs = requests.get(f"{gh_runs_url}/{run_id}/jobs", headers=gh_headers).json()
+    with open(experiments_folder / f"jobs-{run_id}.json", "w") as f:
+        json.dump(jobs, f, indent='\t')
 
 
 def get_run_duration(run_id):
-    run = requests.get(f"{gh_url_runs}/{run_id}", headers=gh_headers).json()
+    run = requests.get(f"{gh_runs_url}/{run_id}", headers=gh_headers).json()
     print(run['name'], run['id'], run['status'])
+    with open(experiments_folder / f"{run_id}.json", "w") as f:
+        json.dump(run, f, indent='\t')
     if run.get("status") == "completed":
         return run.get("run_started_at"), run.get("updated_at")
     else:
@@ -25,6 +33,7 @@ def analyze():
     durations = []
     run_ids = json.loads(run_id_file.read_text())
     for run_id in run_ids:
+        get_jobs(run_id)
         start, end = get_run_duration(run_id)
         t1 = time.strptime(start, "%Y-%m-%dT%H:%M:%SZ")
         t2 = time.strptime(end, "%Y-%m-%dT%H:%M:%SZ")
