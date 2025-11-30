@@ -1,33 +1,26 @@
-import os
 import json
-from pathlib import Path
-import requests
-import matplotlib.pyplot as plt
 from datetime import datetime
-import dotenv
 
-dotenv.load_dotenv()
+import matplotlib.pyplot as plt
+import requests
 
-gitlab_url = os.getenv("GITLAB_URL")
-project_id = "9767"
-token = os.getenv("GITLAB_TOKEN")
-experiment_number = 0
+from experiments.commons import (get_latest_experiment_number, get_run_id_file,
+                                 gitlab_url, gitlab_headers, gitlab_project_id, get_experiment_folder)
 
-headers = {"PRIVATE-TOKEN": token}
-
-run_id_file = Path(__file__).parent / f"run_ids_{experiment_number}.json"
+experiment_number = get_latest_experiment_number('gitlab')
+run_id_file = get_run_id_file(experiment_number, 'gitlab')
 run_ids = json.loads(run_id_file.read_text())
 
 def main():
-    output_root = Path(__file__).parent / f"experiment_{experiment_number}"
+    output_root = get_experiment_folder(experiment_number, 'gitlab')
     output_root.mkdir(exist_ok=True)
 
     indices_120 = []
     durations = []
 
     for run_id in run_ids:
-        jobs_url = f"{gitlab_url}/api/v4/projects/{project_id}/pipelines/{run_id}/jobs"
-        jobs = requests.get(jobs_url, headers=headers).json()
+        jobs_url = f"{gitlab_url}/api/v4/projects/{gitlab_project_id}/pipelines/{run_id}/jobs"
+        jobs = requests.get(jobs_url, headers=gitlab_headers).json()
 
         run_folder = output_root / str(run_id)
         run_folder.mkdir(exist_ok=True)
@@ -35,7 +28,7 @@ def main():
         enriched = []
         for job in jobs:
             job_id = job["id"]
-            detail = requests.get(f"{gitlab_url}/api/v4/projects/{project_id}/jobs/{job_id}", headers=headers).json()
+            detail = requests.get(f"{gitlab_url}/api/v4/projects/{gitlab_project_id}/jobs/{job_id}", headers=gitlab_headers).json()
             started = detail.get("started_at")
             created = detail.get("created_at")
             finished = detail.get("finished_at")
@@ -62,7 +55,7 @@ def main():
                 break
         indices_120.append(idx_120)
 
-        pipe_detail = requests.get(f"{gitlab_url}/api/v4/projects/{project_id}/pipelines/{run_id}", headers=headers).json()
+        pipe_detail = requests.get(f"{gitlab_url}/api/v4/projects/{gitlab_project_id}/pipelines/{run_id}", headers=gitlab_headers).json()
         durations.append(pipe_detail.get("duration"))
 
 

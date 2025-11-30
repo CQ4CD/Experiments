@@ -1,21 +1,16 @@
-import os
 import re
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import dotenv
-from experiments.github.workflow_scheduling.commons import get_latest_experiment_number
-
-dotenv.load_dotenv()
-
-workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
+from experiments.commons import get_latest_experiment_number, workflow_name, get_experiment_folder
 
 experiment_number = get_latest_experiment_number()
-
-BASE_PATH = Path(__file__).parent / workflow_name / f"experiment_{experiment_number}"
+experiments_folder = get_experiment_folder(experiment_number)
 ts_pattern = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)")
 
 def parse_github_timestamp(ts_str):
@@ -91,9 +86,9 @@ def plot_step_durations_gantt(steps, title, savepath):
     plt.close('all')
 
 def main():
-    run_dirs = sorted(BASE_PATH.glob("logs_*"))
+    run_dirs = sorted(experiments_folder.glob("logs_*"))
     if not run_dirs:
-        print(f"No log directories found in {BASE_PATH}")
+        print(f"No log directories found in {experiments_folder}")
         return
 
     for run_i, log_dir in enumerate(run_dirs):
@@ -107,7 +102,7 @@ def main():
         plot_step_durations_gantt(
             steps,
             title=f"Step/job durations for run {run_i}",
-            savepath=BASE_PATH / f"gantt_run{run_i}.png"
+            savepath=experiments_folder / f"gantt_run{run_i}.png"
         )
 
 if __name__ == "__main__":

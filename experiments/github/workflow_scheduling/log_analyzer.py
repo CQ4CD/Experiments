@@ -1,18 +1,12 @@
 import re
-import os
-from pathlib import Path
 from datetime import datetime
+
 import matplotlib.pyplot as plt
-import dotenv
 
-from experiments.github.workflow_scheduling.commons import get_latest_experiment_number
+from experiments.commons import get_latest_experiment_number, get_experiment_folder
 
-dotenv.load_dotenv()
-
-workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
 experiment_number = get_latest_experiment_number()
-
-BASE_PATH = Path(__file__).parent / workflow_name / f"experiment_{experiment_number}"
+experiments_folder = get_experiment_folder(experiment_number)
 ts_pattern = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)")
 
 
@@ -47,7 +41,7 @@ def parse_file_timestamps(filepath):
 def main():
     wait_idxs = []
     run_durations = []
-    for run_i, log_dir in enumerate(sorted(BASE_PATH.glob("logs_*"))):
+    for run_i, log_dir in enumerate(sorted(experiments_folder.glob("logs_*"))):
         if not log_dir.is_dir():
             continue
         file_ts_list = []
@@ -95,7 +89,7 @@ def main():
     plt.title("Location of 'wait (120)' and run duration per run")
     plt.grid(True)
     plt.tight_layout()
-    workflow_durations = BASE_PATH / f"step-index-and-durations.png"
+    workflow_durations = experiments_folder / f"step-index-and-durations.png"
     plt.savefig(workflow_durations)
     plt.show()
 

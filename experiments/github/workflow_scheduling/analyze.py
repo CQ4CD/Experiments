@@ -1,46 +1,19 @@
 import json
-import os
 import time
-import requests
-import dotenv
-import matplotlib.pyplot as plt
-
 from pathlib import Path
 
-from experiments.github.workflow_scheduling.commons import get_latest_experiment_number
+import matplotlib.pyplot as plt
+import requests
 
-dotenv.load_dotenv()
+from experiments.commons import get_latest_experiment_number, workflow_name, gh_url_runs, gh_headers, get_run_id_file, \
+    get_experiment_folder
 
-owner = 'CQ4CD'
-repo = 'Experiments'
-workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
-workflow = f"{workflow_name}.yml"
-token = os.getenv("GH_TOKEN")
 experiment_number = get_latest_experiment_number()
-
-url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
-
-run_id_file = Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json"
-
-headers = {
-    "Accept": "application/vnd.github+json",
-    "Authorization": f"Bearer {token}",
-    "X-GitHub-Api-Version": "2022-11-28"
-}
-
-
-def add_run_id(run_id):
-    if run_id_file.exists():
-        run_ids = json.loads(run_id_file.read_text())
-    else:
-        run_id_file.parent.mkdir(parents=True, exist_ok=True)
-        run_ids = []
-    run_ids.append(run_id)
-    run_id_file.write_text(json.dumps(run_ids, indent='\t'))
+run_id_file = get_run_id_file(experiment_number)
 
 
 def get_run_duration(run_id):
-    run = requests.get(f"{url_runs}/{run_id}", headers=headers).json()
+    run = requests.get(f"{gh_url_runs}/{run_id}", headers=gh_headers).json()
     print(run['name'], run['id'], run['status'])
     if run.get("status") == "completed":
         return run.get("run_started_at"), run.get("updated_at")
@@ -62,7 +35,7 @@ def analyze():
     plt.xlabel("Run")
     plt.ylabel("Duration (s)")
     plt.title("Workflow Durations")
-    workflow_durations = Path(__file__).parent / workflow_name / f"workflow_durations_{experiment_number}.png"
+    workflow_durations = get_experiment_folder(experiment_number) / f"workflow_durations.png"
     plt.savefig(workflow_durations)
 
 

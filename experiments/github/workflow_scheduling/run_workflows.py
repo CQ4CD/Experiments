@@ -1,52 +1,22 @@
 print('Loading run_workflows', flush=True)
 
-import json
-import os
 import time
-import requests
-import dotenv
+
 import matplotlib.pyplot as plt
+import requests
 
-from pathlib import Path
-
-from experiments.github.workflow_scheduling.commons import get_fresh_experiment_number
-
-dotenv.load_dotenv()
-
-owner = 'CQ4CD'
-repo = 'Experiments'
-workflow_name = 'unfair-test-workflow-limited'
-workflow = f"{workflow_name}.yml"
-token = os.getenv("GH_TOKEN")
+from experiments.commons import (get_fresh_experiment_number, owner, repo, workflow,
+                                 gh_headers, get_run_id_file, add_run_id, get_experiment_folder)
 
 experiment_number = get_fresh_experiment_number()
-print('Experiment number', experiment_number, flush=True)
-
 url_dispatch = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches"
 url_runs = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
-
-run_id_file = Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json"
-
-headers = {
-    "Accept": "application/vnd.github+json",
-    "Authorization": f"Bearer {token}",
-    "X-GitHub-Api-Version": "2022-11-28"
-}
-
-
-def add_run_id(run_id):
-    if run_id_file.exists():
-        run_ids = json.loads(run_id_file.read_text())
-    else:
-        run_id_file.parent.mkdir(parents=True, exist_ok=True)
-        run_ids = []
-    run_ids.append(run_id)
-    run_id_file.write_text(json.dumps(run_ids, indent='\t'))
+run_id_file = get_run_id_file(experiment_number)
 
 
 def trigger(run_number):
     print("Triggering run")
-    response = requests.post(url_dispatch, headers=headers, json={"ref": "main"})
+    response = requests.post(url_dispatch, headers=gh_headers, json={"ref": "main"})
     print(response)
     print('Triggered run', run_number, response.status_code)
     if not response.ok:
@@ -59,7 +29,7 @@ def get_latest_run(run_number):
     We instead need to poll the API to get the latest run.
     """
     print(run_number, "Getting latest run")
-    data = requests.get(url_runs, headers=headers).json()
+    data = requests.get(url_runs, headers=gh_headers).json()
     for run in data.get("workflow_runs", []):
         print(run['name'])
         if run.get("name") == workflow:
@@ -71,7 +41,7 @@ def get_latest_run(run_number):
 
 def wait(run_id, run_number):
     while True:
-        run = requests.get(f"{url_runs}/{run_id}", headers=headers).json()
+        run = requests.get(f"{url_runs}/{run_id}", headers=gh_headers).json()
         print("Getting run status!")
         print(run_number, run['name'], run['id'], run['status'])
         if run.get("status") == "completed":
@@ -88,7 +58,7 @@ def experiment():
         while latest is None:
             latest = get_latest_run(run_number)
             time.sleep(10)
-        add_run_id(latest['id'])
+        add_run_id(run_id_file, latest['id'])
         start, end = wait(latest.get("id"), run_number)
         # TODO: This seems inaccurate! Poll webpage to get actual durations?
         t1 = time.strptime(start, "%Y-%m-%dT%H:%M:%SZ")
@@ -100,7 +70,7 @@ def experiment():
     plt.xlabel("Run")
     plt.ylabel("Duration (s)")
     plt.title("Workflow Durations")
-    workflow_durations = Path(__file__).parent / workflow_name / f"workflow_durations_{experiment_number}.png"
+    workflow_durations = get_experiment_folder(experiment_number) / f"workflow_durations.png"
     plt.savefig(workflow_durations)
 
 

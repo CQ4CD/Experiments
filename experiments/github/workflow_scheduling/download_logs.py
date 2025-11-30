@@ -1,40 +1,25 @@
 import json
-import os
 import time
-import requests
 import zipfile
-import dotenv
 
-from pathlib import Path
+import requests
 
-from experiments.github.workflow_scheduling.commons import get_latest_experiment_number
+from experiments.commons import (get_latest_experiment_number, owner, repo, gh_headers,
+                                 get_run_id_file, get_experiment_folder)
 
-dotenv.load_dotenv()
-
-owner = 'CQ4CD'
-repo = 'Experiments'
-workflow_name = os.getenv('GH_WORKFLOW_NAME', 'unfair-test-workflow-limited')
-workflow = f"{workflow_name}.yml"
-token = os.getenv("GH_TOKEN")
 experiment_number = get_latest_experiment_number()
+run_id_file = get_run_id_file(experiment_number)
 
-run_id_file = Path(__file__).parent / workflow_name / f"run_ids_{experiment_number}.json"
-
-headers = {
-    "Accept": "application/vnd.github+json",
-    "Authorization": f"Bearer {token}",
-    "X-GitHub-Api-Version": "2022-11-28"
-}
 
 def download_and_unpack_logs():
     run_ids = json.loads(run_id_file.read_text())
 
     for run_id in run_ids:
         url = f"https://api.github.com/repos/{owner}/{repo}/actions/runs/{run_id}/logs"
-        response = requests.get(url, headers=headers, allow_redirects=False)
+        response = requests.get(url, headers=gh_headers, allow_redirects=False)
 
         if response.status_code == 302:
-            out_dir = Path(__file__).parent / workflow_name / f"experiment_{experiment_number}" / f"logs_{run_id}"
+            out_dir = get_experiment_folder(experiment_number) / f"logs_{run_id}"
             out_dir.mkdir(parents=True, exist_ok=True)
             zip_path = out_dir / "logs.zip"
 
