@@ -1,8 +1,14 @@
 import json
-from pathlib import Path
-import dotenv
 import os
+from datetime import datetime
+from pathlib import Path
 
+import dotenv
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.dates as mdates
+from matplotlib import pyplot as plt
 
 dotenv.load_dotenv()
 
@@ -41,7 +47,7 @@ def get_run_id_file(experiment_number: int, platform='github') -> Path:
 
 
 def get_experiment_folder(experiment_number: int, platform='github') -> Path:
-    return Path(__file__).parent / platform / workflow_name / f"experiment_{experiment_number}"
+    return Path(__file__).parent / platform / 'workflow_scheduling' / workflow_name / f"experiment_{experiment_number}"
 
 
 def get_latest_experiment_number(platform='github') -> int:
@@ -50,6 +56,52 @@ def get_latest_experiment_number(platform='github') -> int:
 
 def get_fresh_experiment_number(platform='github') -> int:
     result = 0
-    while (Path(__file__).parent / platform / workflow_name / f"experiment_{result}").exists():
+    while (Path(__file__).parent / platform / 'workflow_scheduling' / workflow_name / f"experiment_{result}").exists():
         result += 1
     return result
+
+
+class JobDuration:
+    def __init__(self, label: str, start: datetime, end: datetime):
+        self.label = label
+        self.start = start
+        self.end = end
+        self.duration = end - start
+
+
+def plot_job_gantt(jobs: list[JobDuration], title: str, file_path: object | None = None):
+    if not jobs:
+        return
+
+    steps_sorted = sorted(jobs, reverse=True, key=lambda x: x.start)
+    step_names = [step.label for step in steps_sorted]
+    start_times = [step.start for step in steps_sorted]
+    end_times = [step.end for step in steps_sorted]
+    durations_days = [(et - st).total_seconds() / 86400 for st, et in zip(start_times, end_times)]
+
+    fig, ax = plt.subplots(figsize=(10, max(4, len(steps_sorted))))
+    yticks = list(range(len(steps_sorted)))
+
+    ax.barh(
+        yticks,
+        durations_days,
+        left=mdates.date2num(start_times),
+        height=0.8,
+        align='center'
+    )
+
+    ax.set_yticks(yticks)
+    ax.set_yticklabels(step_names)
+    ax.set_xlabel('Time (HH:MM:SS)')
+    ax.set_ylabel('Step/Job')
+    ax.set_title(title)
+    ax.xaxis_date()
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+    ax.grid(axis='x')
+
+    plt.tight_layout()
+    if file_path:
+        plt.savefig(file_path)
+    plt.close(fig)
+    plt.close('all')
+

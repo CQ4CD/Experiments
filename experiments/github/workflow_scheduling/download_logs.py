@@ -45,5 +45,6 @@ def download_and_unpack_logs():
             print(f"Failed to get logs for run {run_id}: status {response.status_code} ({response.text})")
         time.sleep(1)
 
+
 if __name__ == '__main__':
     download_and_unpack_logs()
