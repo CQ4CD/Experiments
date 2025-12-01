@@ -12,12 +12,6 @@ run_id_file = get_run_id_file(experiment_number)
 experiments_folder = get_experiment_folder(experiment_number)
 
 
-def get_jobs(run_id):
-    jobs = requests.get(f"{gh_runs_url}/{run_id}/jobs", headers=gh_headers).json()
-    with open(experiments_folder / f"jobs-{run_id}.json", "w") as f:
-        json.dump(jobs, f, indent='\t')
-
-
 def get_run_duration(run_id):
     run = requests.get(f"{gh_runs_url}/{run_id}", headers=gh_headers).json()
     print(run['name'], run['id'], run['status'])
@@ -33,7 +27,6 @@ def analyze():
     durations = []
     run_ids = json.loads(run_id_file.read_text())
     for run_id in run_ids:
-        get_jobs(run_id)
         start, end = get_run_duration(run_id)
         t1 = time.strptime(start, "%Y-%m-%dT%H:%M:%SZ")
         t2 = time.strptime(end, "%Y-%m-%dT%H:%M:%SZ")
