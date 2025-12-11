@@ -1,0 +1,12 @@
+stages:
+  - wait
+
+wait-jobs:
+  stage: wait
+  parallel:
+    matrix:
+      - WAIT: 25
+      - WAIT: 30
+      - WAIT: 60
+  script:
+    - sleep $WAIT
