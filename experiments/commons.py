@@ -70,39 +70,77 @@ class JobDuration:
         self.duration = end - start
 
 
-def plot_job_gantt(jobs: list[JobDuration], title: str, file_path: object | None = None):
+def plot_job_gantt(jobs, title, file_path=None):
     if not jobs:
         return
 
+    # Sort jobs (latest start first)
     steps_sorted = sorted(jobs, reverse=True, key=lambda x: x.start)
-    step_names = [step.label for step in steps_sorted]
-    start_times = [step.start for step in steps_sorted]
-    end_times = [step.end for step in steps_sorted]
-    durations_days = [(et - st).total_seconds() / 86400 for st, et in zip(start_times, end_times)]
+
+    step_names = [s.label for s in steps_sorted]
+    start_times = [s.start for s in steps_sorted]
+    end_times = [s.end for s in steps_sorted]
+
+    # Normalize start times so axis begins at 0
+    t0 = min(start_times)
+    start_offsets = [(s - t0).total_seconds() for s in start_times]
+    durations = [(e - s).total_seconds() for s, e in zip(start_times, end_times)]
 
     fig, ax = plt.subplots(figsize=(10, max(4, len(steps_sorted))))
     yticks = list(range(len(steps_sorted)))
 
+    # Convert seconds → days for matplotlib
+    start_offsets_days = [so / 86400 for so in start_offsets]
+    durations_days = [d / 86400 for d in durations]
+
+    # Draw bars
     ax.barh(
         yticks,
         durations_days,
-        left=mdates.date2num(start_times),
+        left=start_offsets_days,
         height=0.8,
         align='center'
     )
 
     ax.set_yticks(yticks)
     ax.set_yticklabels(step_names)
-    ax.set_xlabel('Time (HH:MM:SS)')
-    ax.set_ylabel('Step/Job')
+    ax.set_xlabel("Time (HH:MM:SS)")
+    ax.set_ylabel("Step/Job")
     ax.set_title(title)
-    ax.xaxis_date()
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-    ax.grid(axis='x')
+
+    # Fixed axis: 100 seconds (1:40)
+    total_span_seconds = 100
+    total_span_days = total_span_seconds / 86400
+
+    # Tick every 15 seconds
+    tick_interval_seconds = 15
+    tick_interval_days = tick_interval_seconds / 86400
+
+    # Apply axis limits
+    ax.set_xlim(0, total_span_days)
+
+    # Generate ticks
+    ticks = []
+    t = 0
+    while t <= total_span_days + 1e-9:
+        ticks.append(t)
+        t += tick_interval_days
+    ax.set_xticks(ticks)
+
+    # Formatter for HH:MM:SS
+    def format_seconds(x, pos):
+        seconds = int(x * 86400)
+        h = seconds // 3600
+        m = (seconds % 3600) // 60
+        s = seconds % 60
+        return f"{h:02}:{m:02}:{s:02}"
+
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(format_seconds))
+
+    ax.grid(axis="x")
 
     plt.tight_layout()
     if file_path:
         plt.savefig(file_path)
     plt.close(fig)
-    plt.close('all')
-
+    plt.close("all")
