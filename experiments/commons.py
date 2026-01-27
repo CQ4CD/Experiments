@@ -70,12 +70,16 @@ class JobDuration:
         self.duration = end - start
 
 
-def plot_job_gantt(jobs, title, file_path=None):
+def plot_job_gantt(jobs, title, file_path=None, sort=True):
     if not jobs:
         return
 
     # Sort jobs (latest start first)
-    steps_sorted = sorted(jobs, reverse=True, key=lambda x: x.start)
+    if sort:
+        steps_sorted = sorted(jobs, reverse=True, key=lambda x: x.start)
+    else:
+        steps_sorted = jobs.copy()
+        steps_sorted.reverse()
 
     step_names = [s.label for s in steps_sorted]
     start_times = [s.start for s in steps_sorted]

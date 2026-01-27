@@ -27,7 +27,7 @@ def main():
                 started = datetime.fromisoformat(job.get('started_at').replace("Z", "+00:00"))
                 finished = datetime.fromisoformat(job.get('finished_at').replace("Z", "+00:00"))
                 durations.append(JobDuration(job.get('name'), started, finished))
-            plot_job_gantt(durations,f"Step/job durations for run {run_id}", directory / f"gantt_run{run_id}")
+            plot_job_gantt(durations,f"Step/job durations for run {run_id}", directory / f"gantt_run{run_id}", sort=False)
 
 
 if __name__ == "__main__":
