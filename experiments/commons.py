@@ -70,7 +70,7 @@ class JobDuration:
         self.duration = end - start
 
 
-def plot_job_gantt(jobs, title, file_path=None, sort=True):
+def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
     if not jobs:
         return
 
@@ -112,24 +112,25 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True):
     ax.set_ylabel("Step/Job")
     ax.set_title(title)
 
-    # Fixed axis: 100 seconds (1:40)
-    total_span_seconds = 100
-    total_span_days = total_span_seconds / 86400
+    if limit:
+        # Fixed axis: 100 seconds (1:40)
+        total_span_seconds = 100
+        total_span_days = total_span_seconds / 86400
+        # Apply axis limits
+        ax.set_xlim(0, total_span_days)
 
-    # Tick every 15 seconds
-    tick_interval_seconds = 15
-    tick_interval_days = tick_interval_seconds / 86400
+        # Tick every 15 seconds
+        tick_interval_seconds = 15
+        tick_interval_days = tick_interval_seconds / 86400
 
-    # Apply axis limits
-    ax.set_xlim(0, total_span_days)
 
-    # Generate ticks
-    ticks = []
-    t = 0
-    while t <= total_span_days + 1e-9:
-        ticks.append(t)
-        t += tick_interval_days
-    ax.set_xticks(ticks)
+        # Generate ticks
+        ticks = []
+        t = 0
+        while t <= total_span_days + 1e-9:
+            ticks.append(t)
+            t += tick_interval_days
+        ax.set_xticks(ticks)
 
     # Formatter for HH:MM:SS
     def format_seconds(x, pos):
