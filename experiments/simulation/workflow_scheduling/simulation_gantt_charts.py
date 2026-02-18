@@ -8,7 +8,11 @@ from experiments.commons import (get_latest_experiment_number, get_experiment_fo
                                  plot_job_gantt)
 
 def main():
+    project_root = Path(__file__).parent.parent.parent.parent
+    #output_root = project_root.parent / 'ci-simulation' / 'out'
     output_root = Path(__file__).parent
+    print(output_root)
+    print()
     output_root.mkdir(exist_ok=True)
     total_durations = {}
     for directory in [ x for x in output_root.iterdir() if x.is_dir() ]:
