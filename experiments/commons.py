@@ -63,12 +63,20 @@ def get_fresh_experiment_number(platform='github') -> int:
 
 
 class JobDuration:
-    def __init__(self, label: str, start: datetime, end: datetime, runner: str | None = None):
+    def __init__(
+        self,
+        label: str,
+        start: datetime,
+        end: datetime,
+        runner: str | None = None,
+        stage: str | None = None,
+    ):
         self.label = label
         self.start = start
         self.end = end
         self.duration = end - start
         self.runner = runner
+        self.stage = stage
 
 
 def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
@@ -111,6 +119,67 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
             for runner in unique_runners
         ]
 
+    stage_handles = None
+    stage_names = [s.stage for s in steps_sorted if getattr(s, "stage", None)]
+    stage_colors = {}
+    if stage_names:
+        unique_stages = list(dict.fromkeys(stage_names))
+        stage_cmap = plt.get_cmap('Pastel1')
+        stage_colors = {stage: stage_cmap(i % stage_cmap.N) for i, stage in enumerate(unique_stages)}
+        stage_handles = [
+            matplotlib.patches.Patch(color=stage_colors[stage], label=stage, alpha=0.4)
+            for stage in unique_stages
+        ]
+
+        stage_indices = {stage: [] for stage in unique_stages}
+        stage_time_ranges = {stage: [] for stage in unique_stages}
+        for index, step in enumerate(steps_sorted):
+            if step.stage in stage_indices:
+                stage_indices[step.stage].append(index)
+                start_offset = start_offsets_days[index]
+                end_offset = start_offsets_days[index] + durations_days[index]
+                stage_time_ranges[step.stage].append((start_offset, end_offset))
+
+        for stage, indices in stage_indices.items():
+            if not indices:
+                continue
+            stage_times = stage_time_ranges.get(stage, [])
+            if not stage_times:
+                continue
+            stage_start = min(start for start, _ in stage_times)
+            stage_end = max(end for _, end in stage_times)
+            stage_span = max(stage_end - stage_start, 1 / 86400)
+            margin_days = max(stage_span * 0.01, 1 / 86400)
+            stage_left = max(stage_start - margin_days, 0)
+            stage_width = (stage_end - stage_start) + (2 * margin_days)
+
+            sorted_indices = sorted(indices)
+            runs = []
+            run_start = sorted_indices[0]
+            run_end = sorted_indices[0]
+            for idx in sorted_indices[1:]:
+                if idx == run_end + 1:
+                    run_end = idx
+                else:
+                    runs.append((run_start, run_end))
+                    run_start = idx
+                    run_end = idx
+            runs.append((run_start, run_end))
+
+            for run_start, run_end in runs:
+                run_length = run_end - run_start + 1
+                run_center = (run_start + run_end) / 2
+                ax.barh(
+                    run_center,
+                    stage_width,
+                    left=stage_left,
+                    height=run_length,
+                    align='center',
+                    color=stage_colors.get(stage, '#dddddd'),
+                    alpha=0.25,
+                    zorder=0,
+                )
+
     # Draw bars
     ax.barh(
         yticks,
@@ -118,7 +187,8 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
         left=start_offsets_days,
         height=0.8,
         align='center',
-        color=colors
+        color=colors,
+        zorder=2,
     )
 
     ax.set_yticks(yticks)
@@ -160,17 +230,33 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
     ax.grid(axis="x")
 
     legend_rows = 0
+    legend_y = 0.02
+    if stage_handles:
+        stage_columns = min(len(stage_handles), 3)
+        stage_rows = (len(stage_handles) + stage_columns - 1) // stage_columns
+        fig.legend(
+            handles=stage_handles,
+            title="Stage",
+            loc="lower center",
+            bbox_to_anchor=(0.5, legend_y),
+            ncol=stage_columns,
+            frameon=False
+        )
+        legend_rows += stage_rows
+        legend_y += 0.06 * stage_rows
+
     if legend_handles:
         legend_columns = min(len(legend_handles), 3)
-        legend_rows = (len(legend_handles) + legend_columns - 1) // legend_columns
+        runner_rows = (len(legend_handles) + legend_columns - 1) // legend_columns
         fig.legend(
             handles=legend_handles,
             title="Runner",
             loc="lower center",
-            bbox_to_anchor=(0.5, 0.02),
+            bbox_to_anchor=(0.5, legend_y),
             ncol=legend_columns,
             frameon=False
         )
+        legend_rows += runner_rows
 
     legend_padding = 0.12 + (0.06 * legend_rows)
     plt.tight_layout(rect=(0, legend_padding, 1, 1))

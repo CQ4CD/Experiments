@@ -26,14 +26,37 @@ def main():
             pipeline_id = pipeline['id']
             durations = []
             jobs = pipeline['jobs']
+            stages = pipeline.get('stages', [])
+            job_stage_map = {}
+            for stage in stages:
+                stage_name = stage.get('name')
+                for job_id in stage.get('jobs', []):
+                    job_stage_map[job_id] = stage_name
 
             for job in jobs:
                 print('Getting job information for job', job['id'])
                 started = datetime.fromisoformat(job.get('started_at').replace("Z", "+00:00"))
                 finished = datetime.fromisoformat(job.get('finished_at').replace("Z", "+00:00"))
                 runner = job.get('runner')
-                durations.append(JobDuration(job.get('id').replace(pipeline_id, ''), started, finished, runner=runner))
-                all_jobs.append(JobDuration(job.get('id').replace(pipeline_id, ''), started, finished, runner=runner))
+                stage_name = job_stage_map.get(job.get('id'))
+                durations.append(
+                    JobDuration(
+                        job.get('id').replace(pipeline_id, ''),
+                        started,
+                        finished,
+                        runner=runner,
+                        stage=stage_name,
+                    )
+                )
+                all_jobs.append(
+                    JobDuration(
+                        job.get('id').replace(pipeline_id, ''),
+                        started,
+                        finished,
+                        runner=runner,
+                        stage=stage_name,
+                    )
+                )
             #plot_job_gantt(durations,f"Step/job durations for run {run_id}", directory / f"gantt_run{run_id}", sort=False)
         if not all_jobs:
             continue
