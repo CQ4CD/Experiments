@@ -63,11 +63,12 @@ def get_fresh_experiment_number(platform='github') -> int:
 
 
 class JobDuration:
-    def __init__(self, label: str, start: datetime, end: datetime):
+    def __init__(self, label: str, start: datetime, end: datetime, runner: str | None = None):
         self.label = label
         self.start = start
         self.end = end
         self.duration = end - start
+        self.runner = runner
 
 
 def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
@@ -97,13 +98,27 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
     start_offsets_days = [so / 86400 for so in start_offsets]
     durations_days = [d / 86400 for d in durations]
 
+    colors = None
+    legend_handles = None
+    runner_names = [s.runner for s in steps_sorted if getattr(s, "runner", None)]
+    if runner_names:
+        unique_runners = list(dict.fromkeys(runner_names))
+        cmap = plt.get_cmap('tab20')
+        runner_colors = {runner: cmap(i % cmap.N) for i, runner in enumerate(unique_runners)}
+        colors = [runner_colors.get(s.runner, 'tab:blue') for s in steps_sorted]
+        legend_handles = [
+            matplotlib.patches.Patch(color=runner_colors[runner], label=runner)
+            for runner in unique_runners
+        ]
+
     # Draw bars
     ax.barh(
         yticks,
         durations_days,
         left=start_offsets_days,
         height=0.8,
-        align='center'
+        align='center',
+        color=colors
     )
 
     ax.set_yticks(yticks)
@@ -144,8 +159,22 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
 
     ax.grid(axis="x")
 
-    plt.tight_layout()
+    legend_rows = 0
+    if legend_handles:
+        legend_columns = min(len(legend_handles), 3)
+        legend_rows = (len(legend_handles) + legend_columns - 1) // legend_columns
+        fig.legend(
+            handles=legend_handles,
+            title="Runner",
+            loc="lower center",
+            bbox_to_anchor=(0.5, 0.02),
+            ncol=legend_columns,
+            frameon=False
+        )
+
+    legend_padding = 0.12 + (0.06 * legend_rows)
+    plt.tight_layout(rect=(0, legend_padding, 1, 1))
     if file_path:
-        plt.savefig(file_path)
+        plt.savefig(file_path, bbox_inches="tight", pad_inches=0.4)
     plt.close(fig)
     plt.close("all")

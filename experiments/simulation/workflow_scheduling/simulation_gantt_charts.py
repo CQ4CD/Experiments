@@ -2,10 +2,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from fontTools.feaLib.lexer import NonIncludingLexer
-
-from experiments.commons import (get_latest_experiment_number, get_experiment_folder, JobDuration,
-                                 plot_job_gantt)
+from experiments.commons import (JobDuration, plot_job_gantt)
 
 def main():
     project_root = Path(__file__).parent.parent.parent.parent
@@ -33,8 +30,9 @@ def main():
                 print('Getting job information for job', job['id'])
                 started = datetime.fromisoformat(job.get('started_at').replace("Z", "+00:00"))
                 finished = datetime.fromisoformat(job.get('finished_at').replace("Z", "+00:00"))
-                durations.append(JobDuration(job.get('name'), started, finished))
-                all_jobs.append(JobDuration(job.get('name'), started, finished))
+                runner = job.get('runner')
+                durations.append(JobDuration(job.get('name'), started, finished, runner=runner))
+                all_jobs.append(JobDuration(job.get('name'), started, finished, runner=runner))
             #plot_job_gantt(durations,f"Step/job durations for run {run_id}", directory / f"gantt_run{run_id}", sort=False)
         if not all_jobs:
             continue
