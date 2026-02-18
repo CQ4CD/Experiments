@@ -23,6 +23,7 @@ def main():
             run_id = pipeline['id']
             print('Creating Gantt chart for run', file)
 
+            pipeline_id = pipeline['id']
             durations = []
             jobs = pipeline['jobs']
 
@@ -31,12 +32,12 @@ def main():
                 started = datetime.fromisoformat(job.get('started_at').replace("Z", "+00:00"))
                 finished = datetime.fromisoformat(job.get('finished_at').replace("Z", "+00:00"))
                 runner = job.get('runner')
-                durations.append(JobDuration(job.get('name'), started, finished, runner=runner))
-                all_jobs.append(JobDuration(job.get('name'), started, finished, runner=runner))
+                durations.append(JobDuration(job.get('id').replace(pipeline_id, ''), started, finished, runner=runner))
+                all_jobs.append(JobDuration(job.get('id').replace(pipeline_id, ''), started, finished, runner=runner))
             #plot_job_gantt(durations,f"Step/job durations for run {run_id}", directory / f"gantt_run{run_id}", sort=False)
         if not all_jobs:
             continue
-        plot_job_gantt(all_jobs,f"Step/job durations for all jobs", directory / f"gantt_run_all_jobs", sort=False)
+        plot_job_gantt(all_jobs,f"Step/job durations for all jobs", directory / f"gantt_run_all_jobs", sort=True)
         jobs_sorted = sorted(all_jobs, reverse=False, key=lambda x: x.start)
         first = jobs_sorted[0]
         jobs_sorted = sorted(all_jobs, reverse=True, key=lambda x: x.end)
