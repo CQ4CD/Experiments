@@ -125,6 +125,18 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
     if stage_names:
         unique_stages = list(dict.fromkeys(stage_names))
         stage_cmap = plt.get_cmap('Pastel1')
+        stage_first_offsets = {}
+        for stage in unique_stages:
+            indices = [
+                index
+                for index, step in enumerate(steps_sorted)
+                if getattr(step, "stage", None) == stage
+            ]
+            if indices:
+                stage_first_offsets[stage] = min(start_offsets_days[i] for i in indices)
+            else:
+                stage_first_offsets[stage] = float("inf")
+        unique_stages = sorted(unique_stages, key=lambda stage: stage_first_offsets.get(stage, float("inf")))
         stage_colors = {stage: stage_cmap(i % stage_cmap.N) for i, stage in enumerate(unique_stages)}
         stage_handles = [
             matplotlib.patches.Patch(color=stage_colors[stage], label=stage, alpha=0.4)
