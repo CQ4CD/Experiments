@@ -101,7 +101,25 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
     start_offsets = [(s - t0).total_seconds() for s in start_times]
     durations = [(e - s).total_seconds() for s, e in zip(start_times, end_times)]
 
-    fig, ax = plt.subplots(figsize=(10, max(4, len(steps_sorted))))
+    job_count = len(steps_sorted)
+    large_plot = job_count > 30
+    if large_plot:
+        height_per_job = 0.6
+        fig_height = max(6, job_count * height_per_job)
+        fig_width = 16
+        fig_dpi = 200
+        use_constrained_layout = True
+    else:
+        height_per_job = 0.28
+        fig_height = max(4, job_count * height_per_job)
+        fig_width = 12
+        fig_dpi = 160
+        use_constrained_layout = False
+    fig, ax = plt.subplots(
+        figsize=(fig_width, fig_height),
+        dpi=fig_dpi,
+        constrained_layout=use_constrained_layout,
+    )
     yticks = list(range(len(steps_sorted)))
 
     # Convert seconds → days for matplotlib
@@ -206,7 +224,8 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
     )
 
     ax.set_yticks(yticks)
-    ax.set_yticklabels(step_names)
+    label_fontsize = 6 if job_count > 120 else 8
+    ax.set_yticklabels(step_names, fontsize=label_fontsize)
     ax.set_xlabel("Time (HH:MM:SS)")
     ax.set_ylabel("Step/Job")
     ax.set_title(title)
@@ -272,9 +291,11 @@ def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):
         )
         legend_rows += runner_rows
 
-    legend_padding = 0.12 + (0.06 * legend_rows)
-    plt.tight_layout(rect=(0, legend_padding, 1, 1))
+    if not fig.get_constrained_layout():
+        legend_padding = 0.12 + (0.06 * legend_rows)
+        plt.tight_layout(rect=(0, legend_padding, 1, 1))
     if file_path:
-        plt.savefig(file_path, bbox_inches="tight", pad_inches=0.4)
+        output_dpi = 300 if large_plot else 200
+        plt.savefig(file_path, bbox_inches="tight", pad_inches=0.4, dpi=output_dpi)
     plt.close(fig)
     plt.close("all")
