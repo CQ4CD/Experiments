@@ -70,6 +70,7 @@ class JobDuration:
         end: datetime,
         runner: str | None = None,
         stage: str | None = None,
+        status: str | None = None,
     ):
         self.label = label
         self.start = start
@@ -77,6 +78,7 @@ class JobDuration:
         self.duration = end - start
         self.runner = runner
         self.stage = stage
+        self.status = status
 
 
 def plot_job_gantt(jobs, title, file_path=None, sort=True, limit=False):

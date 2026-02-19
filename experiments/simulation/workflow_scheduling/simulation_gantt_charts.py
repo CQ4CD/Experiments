@@ -6,7 +6,7 @@ from experiments.commons import (JobDuration, plot_job_gantt)
 
 def main():
     project_root = Path(__file__).parent.parent.parent.parent
-    #output_root = project_root.parent / 'ci-simulation' / 'out'
+    output_root = project_root.parent / 'ci-simulation' / 'out'
     output_root = Path(__file__).parent
     print(output_root)
     print()
@@ -35,10 +35,17 @@ def main():
 
             for job in jobs:
                 print('Getting job information for job', job['id'])
+                if 'skipped' == job.get('status') or job.get('started_at') is None:
+                    continue
+
+                print(job)
+                print(job.get('status'))
                 started = datetime.fromisoformat(job.get('started_at').replace("Z", "+00:00"))
                 finished = datetime.fromisoformat(job.get('finished_at').replace("Z", "+00:00"))
                 runner = job.get('runner')
                 stage_name = job_stage_map.get(job.get('id'))
+                if stage_name is not None:
+                    print('Stage:', stage_name)
                 durations.append(
                     JobDuration(
                         job.get('id').replace(pipeline_id, ''),
@@ -46,6 +53,7 @@ def main():
                         finished,
                         runner=runner,
                         stage=stage_name,
+                        status=job.get('status')
                     )
                 )
                 all_jobs.append(
@@ -55,6 +63,7 @@ def main():
                         finished,
                         runner=runner,
                         stage=stage_name,
+                        status=job.get('status')
                     )
                 )
             #plot_job_gantt(durations,f"Step/job durations for run {run_id}", directory / f"gantt_run{run_id}", sort=False)
